@@ -19,4 +19,5 @@ pub struct User {
 pub struct NewUser<'x> {
   pub first_name: &'x str,
   pub last_name: Option<&'x str>,
+  pub email: String,
 }

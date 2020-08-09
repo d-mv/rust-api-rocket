@@ -64,9 +64,9 @@ pub fn insert(content_type: &ContentType, user_data: Data) -> Flash<Redirect> {
 
     options.allowed_fields = vec![
         MultipartFormDataField::file("spotted_photo"),
-        MultipartFormDataField::text("fantasy_name"),
-        MultipartFormDataField::text("real_name"),
-        MultipartFormDataField::text("strength_level"),
+        MultipartFormDataField::text("first_name"),
+        MultipartFormDataField::text("last_name"),
+        MultipartFormDataField::text("email"),
     ];
 
     /* If stuff matches, do stuff */
@@ -97,18 +97,18 @@ pub fn insert(content_type: &ContentType, user_data: Data) -> Flash<Redirect> {
             /* Insert our form data inside our database */
             let insert = diesel::insert_into(users::table)
                 .values(NewUser {
-                    fantasy_name: match form.texts.get("fantasy_name") {
+                    first_name: match form.texts.get("first_name") {
                         Some(value) => &value[0].text,
                         None => "No Name.",
                     },
-                    real_name: match form.texts.get("real_name") {
+                    last_name: match form.texts.get("last_name") {
                         Some(content) => Some(&content[0].text),
                         None => None,
                     },
-                    spotted_photo: user_img.unwrap(),
-                    strength_level: match form.texts.get("strength_level") {
-                        Some(level) => level[0].text.parse::<i32>().unwrap(),
-                        None => 0,
+                    // spotted_photo: user_img.unwrap(),
+                    email: match form.texts.get("email") {
+                        Some(level) => level[0].text.parse::<i32>().unwrap().to_string(),
+                        None => "none".to_string(),
                     },
                 })
                 .execute(&crate::establish_connection());
@@ -147,7 +147,7 @@ pub fn update(id: i32) -> Template {
         .select(users::all_columns)
         .filter(users::id.eq(id))
         .load::<User>(&crate::establish_connection())
-        .expect("Something happned while retrieving the hero of this id");
+        .expect("Something happened while retrieving the user of this id");
 
     context.insert("user", user_data);
 
@@ -163,11 +163,11 @@ pub fn process_update(content_type: &ContentType, user_data: Data) -> Flash<Redi
     let mut options = MultipartFormDataOptions::new();
 
     options.allowed_fields = vec![
-        MultipartFormDataField::file("spotted_photo"),
+        // MultipartFormDataField::file("spotted_photo"),
         MultipartFormDataField::text("id"),
-        MultipartFormDataField::text("fantasy_name"),
-        MultipartFormDataField::text("real_name"),
-        MultipartFormDataField::text("strength_level"),
+        MultipartFormDataField::text("first_name"),
+        MultipartFormDataField::text("last_name"),
+        MultipartFormDataField::text("email"),
     ];
 
     /* If stuff matches, do stuff */
@@ -205,18 +205,18 @@ pub fn process_update(content_type: &ContentType, user_data: Data) -> Flash<Redi
                 ),
             )
             .set(NewUser {
-                fantasy_name: match form.texts.get("fantasy_name") {
+                first_name: match form.texts.get("first_name") {
                     Some(value) => &value[0].text,
                     None => "No Name.",
                 },
-                real_name: match form.texts.get("real_name") {
+                last_name: match form.texts.get("last_name") {
                     Some(content) => Some(&content[0].text),
                     None => None,
                 },
-                spotted_photo: user_img.unwrap(),
-                strength_level: match form.texts.get("strength_level") {
-                    Some(level) => level[0].text.parse::<i32>().unwrap(),
-                    None => 0,
+                // spotted_photo: user_img.unwrap(),
+                email: match form.texts.get("email") {
+                    Some(level) => level[0].text.parse::<i32>().unwrap().to_string(),
+                    None => "none".to_string(),
                 },
             })
             .execute(&crate::establish_connection());
